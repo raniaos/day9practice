@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fintech App - Transaksi</title>
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Fintech Transaction Management</h1>
+    <h3 id="displayUsername" class="hidden"></h3>
+    <div id="login-form">
+      <label for="username">Enter Username:</label>
+      <input type="text" id="username" />
+      <button id="login-btn" onclick="login()">Login</button>
+    </div>
+    <div id="transaction-logout" class="hidden">
+      <h2>Daftar Transaksi</h2>
+      <ul id="transaction-list"></ul>
+
+      <div id="transaction-form">
+        <label for="amount">Transaction Amount:</label>
+        <input type="number" id="amount" placeholder="Enter amount" />
+        <button id="add-transaction-btn" onclick="addTransaction()">
+          Add Transaction
+        </button>
+      </div>
+      <form onsubmit="logout(event)">
+        <button id="logout-btn" type="submit">Logout</button>
+      </form>
+    </div>
+
+    <script>
+      const transactionList = localStorage.getItem("transactionList")
+        ? JSON.parse(localStorage.getItem("transactionList"))
+        : [];
+      if (sessionStorage.getItem("username") != null) {
+        renderList();
+        displayUsername.innerHTML =
+          "Welcome, " + sessionStorage.getItem("username");
+        hideItems();
+      }
+      function login() {
+        const displayUsername = document.getElementById("displayUsername");
+        const inputUsername = document.querySelector("#username").value;
+        if (!inputUsername) {
+          alert("Username is required!");
+          return;
+        }
+        displayUsername.innerHTML = "Welcome, " + inputUsername;
+        hideItems();
+        sessionStorage.setItem("username", inputUsername);
+        renderList();
+      }
+
+      function hideItems() {
+        displayUsername.classList.remove("hidden");
+        document
+          .querySelector("#transaction-logout")
+          .classList.remove("hidden");
+        document.querySelector("#login-form").classList.add("hidden");
+      }
+
+      function renderList() {
+        const transactionListData = document.querySelector("#transaction-list");
+        transactionListData.innerHTML = "";
+        let row = "";
+        transactionList.forEach((element) => {
+          row += `
+                <li>ID: ${element.id}, Jumlah: ${element.jumlah}, Status: ${element.status}</li>
+            `;
+        });
+        transactionListData.innerHTML = row;
+      }
+
+      function addTransaction() {
+        const transaction = document.querySelector("#amount").value;
+        if (!transaction) {
+          alert("Transaction amount is required!");
+          return;
+        }
+        const transactionItem = {
+          id: transactionList.length + 1,
+          jumlah: transaction,
+          status: "Pending",
+        };
+        transactionList.push(transactionItem);
+        localStorage.setItem(
+          "transactionList",
+          JSON.stringify(transactionList)
+        );
+        renderList();
+      }
+
+      function logout(event) {
+        sessionStorage.removeItem("username");
+      }
+    </script>
+  </body>
+</html>
